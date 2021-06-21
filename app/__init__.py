@@ -5,9 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 app = Flask(__name__)
 
-@app.route('/health')
-def index():
-    return render_template('health.html')
 
 @app.route('/')
 def index():
@@ -33,3 +30,9 @@ def about_sebastian():
 @app.route('/post')
 def post():
     return render_template('post.html', title="Post")
+
+# Logic for /health, deploting to EC2
+@app.route('/health', methods=['GET'])
+def health():
+    if request.method == 'GET':
+        return Response("{'Success'}", status=200, mimetype='application/json')
