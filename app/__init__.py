@@ -34,5 +34,4 @@ def post():
 # Logic for /health, deploting to EC2
 @app.route('/health', methods=['GET'])
 def health():
-    if request.method == 'GET':
-        return Response("{'Success'}", status=200, mimetype='application/json')
+    return render_template('health.html')
