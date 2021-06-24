@@ -1,9 +1,12 @@
 import os
-from flask import Flask, render_template, send_from_directory, Response
+from flask import Flask, render_template, send_from_directory, request
 from dotenv import load_dotenv
+from . import db
 
 load_dotenv()
 app = Flask(__name__)
+app.config['DATABASE'] = os.path.join(os.getcwd(), 'flask.sqlite')
+db.init_app(app)
 
 
 @app.route('/')
