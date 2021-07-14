@@ -3,25 +3,29 @@ from flask import Flask, render_template, send_from_directory, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+
 # from . import db
 # from app.db import get_db
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{table}'.format(
-    user=os.getenv('POSTGRES_USER'),
-    passwd=os.getenv('POSTGRES_PASSWORD'),
-    host=os.getenv('POSTGRES_HOST'),
+app.config[
+    "SQLALCHEMY_DATABASE_URI"
+] = "postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{table}".format(
+    user=os.getenv("POSTGRES_USER"),
+    passwd=os.getenv("POSTGRES_PASSWORD"),
+    host=os.getenv("POSTGRES_HOST"),
     port=5432,
-    table=os.getenv('POSTGRES_DB'))
+    table=os.getenv("POSTGRES_DB"),
+)
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
 class UserModel(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     username = db.Column(db.String(), primary_key=True)
     password = db.Column(db.String())
@@ -34,49 +38,55 @@ class UserModel(db.Model):
         return f"<User {self.username}>"
 
 
-
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('home.html')
+    return render_template("home.html")
 
-@app.route('/about')
+
+@app.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template("about.html")
 
-@app.route('/about/ishika')
+
+@app.route("/about/ishika")
 def about_ishika():
-    return render_template('ishika.html', fellowName='Ishika');
+    return render_template("ishika.html", fellowName="Ishika")
 
-@app.route('/about/frankie')
+
+@app.route("/about/frankie")
 def about_frankie():
-    return render_template('frankie.html', fellowName='Frankie');
+    return render_template("frankie.html", fellowName="Frankie")
 
-@app.route('/about/sebastian')
+
+@app.route("/about/sebastian")
 def about_sebastian():
-    return render_template('sebastian.html', fellowName='Sebastian');
-    return render_template('index.html', title="MLH Fellow", url=os.getenv("URL"))
+    return render_template("sebastian.html", fellowName="Sebastian")
+    return render_template("index.html", title="MLH Fellow", url=os.getenv("URL"))
 
-@app.route('/post')
+
+@app.route("/post")
 def post():
-    return render_template('post.html', title="Post")
+    return render_template("post.html", title="Post")
+
 
 # Logic for /health, deploting to EC2
-@app.route('/health', methods=['GET'])
+@app.route("/health", methods=["GET"])
 def health():
-    return render_template('health.html')
+    return render_template("health.html")
+
 
 # Register route logic
-@app.route('/register', methods=('GET', 'POST'))
+@app.route("/register", methods=("GET", "POST"))
 def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
         error = None
 
         if not username:
-            error = 'Username is required.'
+            error = "Username is required."
         elif not password:
-            error = 'Password is required.'
+            error = "Password is required."
         elif UserModel.query.filter_by(username=username).first() is not None:
             error = f"User {username} is already registered."
 
@@ -88,29 +98,30 @@ def register():
         else:
             return error, 418
 
-
     ## TODO: Return a restister page
-    return render_template('register.html')
+    return render_template("register.html")
 
-#Login logic
 
-@app.route('/login', methods=('GET', 'POST'))
+# Login logic
+
+
+@app.route("/login", methods=("GET", "POST"))
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
         error = None
         user = UserModel.query.filter_by(username=username).first()
 
         if user is None:
-            error = 'Incorrect username.'
+            error = "Incorrect username."
         elif not check_password_hash(user.password, password):
-            error = 'Incorrect password.'
+            error = "Incorrect password."
 
         if error is None:
             return "Login Successful", 200
         else:
             return error, 418
-    
+
     ## TODO: Return a login page
-    return render_template('login.html')
+    return render_template("login.html")
